@@ -21,13 +21,13 @@ Follow these steps to execute the Ansible project:
 1. **Clone the Repository**: Clone the Ansible project repository to the control node.
 
    ```bash
-   git clone <repository_url>
+   git clone https://github.com/dreyabraham/ansible-tech-challenge.git
    ```
 
 2. **Navigate to Project Directory**: Change directory to the root of the Ansible project.
 
    ```bash
-   cd <project_directory>
+   cd ansible-tech-challenge
    ```
 
 3. **Update Variables**: Update variables in the main playbook (`site.yaml`) and role files (`roles`) as per the environment and requirements.
@@ -46,4 +46,4 @@ By following the steps outlined in this documentation, you can automate the depl
 Feel free to reach out for any assistance or troubleshooting during the execution of the Ansible project.
 
 ---
-This documentation provides a comprehensive guide for executing the Ansible project. Adjustments can be made based on specific project requirements and environment configurations.
+This documentation provides a guide for executing the Ansible project. Adjustments can be made based on specific project requirements and environment configurations.
