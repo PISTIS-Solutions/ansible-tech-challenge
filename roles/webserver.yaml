@@ -1,0 +1,33 @@
+---
+- name: Configure and Deploy Web Application
+  hosts: launched_instances
+  remote_user: "{{ ansible_ssh_user }}"
+  become: true
+  become_method: sudo
+  vars:
+    web_app_port: 80  # Port on which the web application will run
+    ansible_ssh_port: 22  # Assuming SSH port is 22
+    ansible_ssh_user: "ec2-user"
+  tasks:
+    - name: Install Apache web server
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start Apache service
+      service:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: Create index.html file
+      template:
+        src: ../files/index.html
+        dest: /var/www/html/index.html
+      notify: Restart Apache
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: httpd
+        state: restarted

@@ -1,0 +1,14 @@
+- hosts: all
+  tasks:
+    - name: Import Security-group file
+      import_playbook: ../roles/security-group.yaml
+
+- hosts: all
+  tasks:
+    - name: Import ec2-instance file
+      import_playbook: ../roles/ec2-instance.yaml
+
+- hosts: all
+  tasks:
+    - name: Import webserver file
+      import_playbook: ../roles/webserver.yaml
