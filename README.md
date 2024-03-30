@@ -35,7 +35,7 @@ Follow these steps to execute the Ansible project:
 4. **Execute the Playbook**: Run the main playbook (`site.yaml`) using the `ansible-playbook` command.
 
    ```bash
-   ansible-playbook -i inventory/dev playbook/site.yaml
+   ansible-playbook -i inventory/dev.yaml playbook/main.yaml
    ```
 
 5. **Monitor Execution**: Monitor the execution of the playbook for any errors or warnings. Ensure that all tasks complete successfully.

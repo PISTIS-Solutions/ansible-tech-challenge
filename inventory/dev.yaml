@@ -1,0 +1,7 @@
+[aws]
+localhost ansible_connection=local
+
+[aws:vars]
+region = eu-west-2
+
+[launched_instances]

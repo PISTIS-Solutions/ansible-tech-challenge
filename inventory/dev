@@ -1,7 +1,0 @@
-plugin: aws_ec2
-regions:
-  - eu-west-2
-filters:
-  "tag:EnvName": "Test Environment"
-
-[launched_instances]

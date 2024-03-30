@@ -1,0 +1,47 @@
+---
+- name: security_group
+  hosts: localhost
+  gather_facts: yes
+
+  tasks:
+    - name: Create VPC
+      amazon.aws.ec2_vpc_net:
+        name: demo_vpc
+        cidr_block: 10.0.0.0/16
+        region: eu-west-2
+        tags:
+          env: dev
+        state: present
+      register: vpc_net
+
+    - name: Create Subnet
+      amazon.aws.ec2_vpc_subnet:
+        state: present
+        vpc_id: "{{ vpc_net.vpc.id }}"
+        cidr: 10.10.0.0/16
+        map_public: true
+        tags:
+          Name: etcd-subnet
+          env: dev
+      register: etcd_subnet   
+    
+    - name: Create Security Group
+      amazon.aws.ec2_group:
+        name: demo-sg
+        description: Security Group for etcd
+        vpc_id: "{{ vpc_net.vpc.id }}"
+        region: eu-central-1
+        rules:
+          - proto: tcp
+            ports:
+              - 80 # etcd client port
+              - 22 # etcd peer port
+            cidr_ip: 10.0.0.0/16
+          - proto: tcp
+            ports:
+              - 22 # ssh port
+            cidr_ip: 0.0.0.0/0
+        tags:
+          env: dev
+        state: present
+      register: etcd_sg
