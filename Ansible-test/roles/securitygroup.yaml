@@ -1,0 +1,79 @@
+---
+- name: Create VPC, Subnet, Route Table, and Internet Gateway
+  hosts: localhost
+  gather_facts: no
+  vars:
+    aws_region: "eu-west-2"
+    vpc_cidr_block: "10.0.0.0/16"
+    subnet_cidr_block: "10.0.0.0/24"
+    route_table_name: "my_route_table"
+    internet_gateway_name: "my_internet_gateway"
+
+  tasks:
+    - name: Create VPC
+      amazon.aws.ec2_vpc_net:
+        name: my_vpc
+        cidr_block: "{{ vpc_cidr_block }}"
+        region: "{{ aws_region }}"
+        tags:
+          Name: my_vpc
+      register: vpc_result
+
+    - name: Create Subnet
+      amazon.aws.ec2_vpc_subnet:
+        state: present
+        vpc_id: "{{ vpc_result.vpc.id }}"
+        cidr: "{{ subnet_cidr_block }}"
+        map_public: true
+        region: "{{ aws_region }}"
+        tags:
+          Name: my_subnet
+      register: etcd_subnet
+
+    - name: Create Internet Gateway
+      amazon.aws.ec2_vpc_igw:
+        vpc_id: "{{ vpc_result.vpc.id }}"
+        region: "{{ aws_region }}"
+        tags:
+          Name: "{{ internet_gateway_name }}"
+      register: igw_result
+
+    - name: Create Route Table
+      amazon.aws.ec2_vpc_route_table:
+        vpc_id: "{{ vpc_result.vpc.id }}"
+        state: present
+        tags:
+          Name: "{{ route_table_name }}"
+      register: route_table_result
+
+    - name: Attach Internet Gateway to VPC
+      amazon.aws.ec2_vpc_route_table:
+        vpc_id: "{{ vpc_result.vpc.id }}"
+        route_table_id: "{{ route_table_result.route_table.id }}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ igw_result.gateway_id }}"
+        state: present
+        tags:
+          Name: "{{ route_table_name }}_with_igw"
+    
+    - name: Create Security Group
+      amazon.aws.ec2_group:
+        name: demo-sg
+        description: Security Group for etcd
+        vpc_id: "{{ vpc_result.vpc.id }}"
+        region: eu-west-2
+        rules:
+          - proto: tcp
+            ports:
+              - 80 # etcd client port
+              - 22 # etcd peer port
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            ports:
+              - 22 # ssh port
+            cidr_ip: 0.0.0.0/0
+        tags:
+          env: dev
+        state: present
+      register: etcd_sg

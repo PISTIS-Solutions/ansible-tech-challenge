@@ -1,4 +1,9 @@
 ---
+- name: Provision AWS Resources
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
 - name: include security-group file
   import_playbook: roles/securitygroup.yaml
 
@@ -6,4 +11,4 @@
   import_playbook: roles/ec2instance.yaml
  
 - name: import webserver file
-   import_playbook: roles/webserver.yaml
+  import_playbook: roles/webserver.yaml

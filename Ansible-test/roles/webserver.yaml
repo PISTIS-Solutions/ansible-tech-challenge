@@ -1,6 +1,6 @@
 ---
 - name: Configure and Deploy Web Application
-  hosts: launched_instances
+  hosts: "created_instances"
   remote_user: "{{ ansible_ssh_user }}"
   become: true
   become_method: sudo
@@ -8,6 +8,8 @@
     web_app_port: 80  # Port on which the web application will run
     ansible_ssh_port: 22  # Assuming SSH port is 22
     ansible_ssh_user: "ec2-user"
+    ansible_ssh_private_key_file: "/Users/macbookpro2015/Documents/Ansible-test/roles/my_keyy.pem"  # Specify the path to your private key
+    ansible_connection: ssh  # Use SSH connection
   tasks:
     - name: Install Apache web server
       yum:
