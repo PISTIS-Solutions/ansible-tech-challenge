@@ -1,0 +1,60 @@
+---
+- name: Install and configure Apache
+  hosts: webservers
+  become: yes
+  vars:
+    apache_user: www-data
+    apache_group: www-data
+    apache_port: 80
+    document_root: /var/www/html
+
+  tasks:
+    - name: Ensure Apache is installed
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
+
+    - name: Ensure Apache is running and enabled
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Configure Apache to listen on a specific port
+      lineinfile:
+        path: /etc/apache2/ports.conf
+        regexp: '^Listen '
+        line: "Listen {{ apache_port }}"
+        state: present
+        backup: yes
+
+    - name: Set up the document root
+      file:
+        path: "{{ document_root }}"
+        state: directory
+        owner: "{{ apache_user }}"
+        group: "{{ apache_group }}"
+        mode: '0755'
+
+    - name: Copy the default index.html file
+      copy:
+        content: |
+          <html>
+          <head>
+              <title>Welcome to Apache</title>
+          </head>
+          <body>
+              <h1>It works!</h1>
+          </body>
+          </html>
+        dest: "{{ document_root }}/index.html"
+        owner: "{{ apache_user }}"
+        group: "{{ apache_group }}"
+        mode: '0644'
+
+    - name: Ensure the firewall allows HTTP traffic
+      ufw:
+        rule: allow
+        port: "{{ apache_port }}"
+        proto: tcp
